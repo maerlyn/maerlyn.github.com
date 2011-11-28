@@ -1,0 +1,27 @@
+body {
+  width: 780px;
+  margin: 0 auto;
+  font-family: Georgia, Times New Roman, serif;
+  font-size: 18px;
+  background-color: #ddd;
+}
+
+h1 {
+  font-size: 2em;
+  width: 100%;
+  text-align: center;
+}
+
+a, a:visited { color: black; }
+a:hover, a:active { color: #333; }
+
+article header h1 { 
+  font-size: 1.5em; 
+}
+
+article header h2 {
+  font-size: 1em;
+  color: #666;
+  text-align: center;
+}
+

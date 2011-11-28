@@ -1,0 +1,12 @@
+  <article>
+    <header>
+      <h1><a href="{{ page.url }}">{{ page.title }}</a></h1>
+      <h2>{{ page.date | date: "%Y. %m. %d." }}</h2>
+    </header>
+    
+    {% if content %}
+      {{ content }}
+    {% else %}
+      {{ page.content }}
+    {% endif %}
+  </article>

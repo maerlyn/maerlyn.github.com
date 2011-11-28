@@ -1,0 +1,25 @@
+---
+layout: nil
+---
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <title>Maërlyn</title>
+
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <header>
+    <h1><a href="/">Maërlyn</a></h1>
+  </header>
+  
+{% for post in site.posts limit:10 %}
+  {% assign page = post %}
+  {% include post.html %}
+{% endfor %}
+
+</body>
+</html>
+
