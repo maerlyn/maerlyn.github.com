@@ -38,6 +38,20 @@ $stmt->execute(array(
 > Két sajnálatos kivétel akad: a `limit` és az `offset` paramétereit nem lehet így átadni,
 ott magunknak kell megoldanunk azon értékek biztonságossá tételét.
 
+Van egy harmadik módszer is, ezt akkor érdemes használni, amikor nem várunk eredményhalmazt
+(mert például beállítunk valamit, vagy egy `DELETE` queryről van szó):
+
+{% highlight php startinline %}
+$db->exec("SET time_zone = '+01:00';");
+$db->exec("DELETE FROM `blog`;);
+{% endhighlight %}
+
+ennek visszatérési értéke egy egész, ami a módosított sorok számát tartalmazza.
+
+A prepared statementek hatalmas előnye a korábbi, kézzel összeállított querykkel szemben,
+hogy gyakorlatilag tökéletesen védve vagyunk az SQL injection támadásokkal szemben,
+nem fordulhat elő, hogy egy változót elfelejtünk escapelni.
+
 Mindkét megoldás egy [`PDOStatement`](http://hu.php.net/manual/en/class.pdostatement.php)
 példánnyal tér vissza, aminek megvan az a csodás tulajdonsága, hogy megvalósítja a
 [`Traversable`](http://hu.php.net/manual/en/class.traversable.php) interface-t, ergo
@@ -45,7 +59,13 @@ egy `foreach()`-csel bejárható:
 
 {% highlight php startinline %}
 foreach ($stmt as $row) {
-  //
+  // feldolgozás, kiírás
 }
+{% endhighlight %}
+
+Ami még jól jöhet: stringek query-biztossá tétele:
+
+{% highlight php startinline %}
+$id = $db->quote($_GET["id"]);
 {% endhighlight %}
 
