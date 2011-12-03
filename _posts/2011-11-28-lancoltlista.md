@@ -27,10 +27,17 @@ Ut pork veniam, aute sint tongue pork loin meatloaf venison occaecat duis magna 
 
 Capicola short loin eu nulla veniam. Ham incididunt in labore est, andouille nostrud. Duis do id beef in. Veniam nulla pariatur, beef ribs pork loin rump minim pastrami esse filet mignon eiusmod boudin consequat. Officia bresaola occaecat pork, bacon turducken boudin pig laboris in commodo quis. Reprehenderit deserunt eiusmod pig meatball irure, cow beef ribs commodo sausage officia. Id ham ut, dolore esse aliqua dolor proident pig bresaola ex anim turducken pork loin.
 
-{% highlight php %}
-    <?php
+{% highlight php linenos %}
+<?php
+  function valami($a, bb) {
+    echo $a . $b;
+  }
+{% endhighlight %}
 
-    function valami($a, bb) {
-      echo $a . $b;
-    }
+sdfsdf
+
+{% highlight ruby %}
+def foo
+  puts 'foo'
+end
 {% endhighlight %}
