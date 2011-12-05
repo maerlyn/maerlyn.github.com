@@ -63,9 +63,20 @@ foreach ($stmt as $row) {
 }
 {% endhighlight %}
 
+Természetesen nem csak így lehet végigmenni az eredményhalmazon. Ott van például
+a [`fetchAll()`][fetchall], ami az összes kapott sort adja vissza egy tömbként.
+
+Aztán ott a [`fetch()`][fetch], ami a klasszikus `mysql_fetch_row()` megfelelője -
+visszaadja a következő sort, ha meg már nincs, akkor logikai hamist. Sok paramétere van,
+például rávehető a lazy loadingra, vagy hogy adott típusú objektumba hidrálja a
+következő sort.
+
 Ami még jól jöhet: stringek query-biztossá tétele:
 
 {% highlight php startinline %}
 $id = $db->quote($_GET["id"]);
 {% endhighlight %}
+
+ [fetchall]: http://hu2.php.net/manual/en/pdostatement.fetchall.php
+ [fetch]: http://hu2.php.net/manual/en/pdostatement.fetch.php
 
