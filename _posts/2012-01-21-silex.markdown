@@ -1,0 +1,40 @@
+---
+layout: post
+title: Silex
+---
+
+Több éve foglalkozom már a [symfony] keretrendszerrel, kényelmes és
+gyorsan lehet vele haladni. Bár egy ideje már stabil a 2.0, idáig játszadozás
+szintjén túl nem foglalkoztam vele. Nemrégiben elém került egy olyan összetettségű
+feladat, amihez már kell egy jó keret, és bár nem [Symfony2]-vel álltam neki,
+valami hasonlóval: ez pedig a [Silex].
+
+Mi is ez? Egy microframework, ami a Symfony2 egyes komponenseire épül. Külön extra,
+hogy az egész egy darab .phar fileként is elérhető, tehát a következő máris egy
+teljesértékű oldal:
+
+{% highlight php %}
+<?php
+require_once __DIR__.'/silex.phar'; 
+
+$app = new Silex\Application(); 
+
+$app->get('/hello/{name}', function($name) use($app) { 
+    return 'Hello '.$app->escape($name); 
+}); 
+
+$app->run();
+{% endhighlight %}
+
+Maga a `$app` egy Dependency Injection container, a legfontosabb külső libekhez
+már készült Silex service: doctrine, Twig, Swiftmailer, monolog.
+
+Hogy viszonylag összetettebb alkalmazást is egyszerűen össze lehet rakni benne,
+remek példa a KnpLabs [marketplace]-e - ebben ott a Twig, a doctrine DBAL, a
+Symfony2 Form és Validator komponense, csupa finomság.
+
+ [symfony]: http://www.symfony-project.org/
+ [Symfony2]: http://symfony.com/
+ [Silex]: http://silex.sensiolabs.org/
+ [marketplace]: https://github.com/KnpLabs/marketplace/
+ 
