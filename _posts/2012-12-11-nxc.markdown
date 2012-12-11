@@ -1,0 +1,11 @@
+---
+layout: post
+title: Meetup előadás
+---
+
+Tegnap a [Veszprémi Technology Meetupon][1] előadás tartottam az NXCről. A diasor
+[itt] letölthető, vagy elérhető a [slideshare]-en.
+
+ [1]: http://www.meetup.com/veszprem/
+ [itt]: /files/nxc-vpmeetup.pdf
+ [slideshare]: http://www.slideshare.net/maerlyng/inverz-inga-nxcben
