@@ -3,7 +3,7 @@ layout: post
 title: Meetup előadás
 ---
 
-Tegnap a [Veszprémi Technology Meetupon][1] előadás tartottam az NXCről. A diasor
+Nemrég a [Veszprémi Technology Meetupon][1] előadás tartottam az NXCről. A diasor
 [itt] letölthető, vagy elérhető a [slideshare]-en.
 
  [1]: http://www.meetup.com/veszprem/
