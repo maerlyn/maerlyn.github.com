@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <h2>Egyszerű form</h2>
+    <form action="#" method="post">
+        <!-- ide jönnek az inputok -->
+    </form>
+
+    <h2>Szövegmezők</h2>
+    Sima szöveg: <input type="text"><br>
+    Hosszú szöveg: <textarea></textarea><br>
+    Jelszó: <input type="password"><br>
+
+    <h2>Választólista</h2>
+    Egyszerű: <select>
+        <option value="0">első</option>
+        <option value="1">második</option>
+    </select><br>
+
+    Csoportosított: <select>
+        <optgroup label="növények">
+            <option>fű</option>
+            <option>fa</option>
+        </optgroup>
+        <optgroup label="állatok">
+            <option>kutya</option>
+            <option>macska</option>
+        </optgroup>
+    </select>
+
+    <h2>Checkbox</h2>
+    <input type="checkbox" name="ez[]" value="1"> egyik<br>
+    <input type="checkbox" name="ez[]" value="2"> másik<br>
+    <input type="checkbox" name="ez[]" value="3"> harmadik
+
+    <h2>Radio</h2>
+    <input type="radio" name="az" value="1"> egyik<br>
+    <input type="radio" name="az" value="2"> másik<br>
+    <input type="radio" name="az" value="3"> harmadik
+
+    <h2>Gombok</h2>
+    <input type="submit" value="Elküld">
+    <input type="reset" value="Mégsem">
+    <button><img src="https://www.google.hu/images/srpr/logo3w.png"></button>
+
+    <h2>Cimkék</h2>
+    <label>
+        <input type="checkbox"> szöveg
+    </label><br />
+
+    <input type="checkbox" id="valami">
+    <label for="valami">szöveg</label>
+
+    <h2>Number, range</h2>
+    Number: <input type="number"><br>
+    Range: <input type="range"><br>
+
+    <h2>Date, time, color, search</h2>
+    Date: <input type="date"><br>
+    Time: <input type="time"><br>
+    Color: <input type="color"><br>
+    Search: <input type="search">
+
+    <h2>Datalist</h2>
+    <input type="text" list="mydata">
+    <datalist id="mydata">
+        <option label="Mr" value="Mister">
+        <option label="Mrs" value="Mistress">
+        <option label="Ms" value="Miss">
+    </datalist>
+
+    <h2>Tel, email, url</h2>
+    Tel: <input type="tel"><br>
+    Email: <input type="email"><br>
+    Url: <input type="url"><br>
+
+    <h2>Placeholder</h2>
+    <input type="text" placeholder="John Doe">
+
+    <h2>Min, max, step</h2>
+    Min, max: <input type="number" min="1" max="10"><br>
+    Step: <input type="time" step="1800">
+
+    <h2>Pattern</h2>
+    <input type="text" pattern="[0-9]{4}">
+</body>
+</html>
