@@ -18,14 +18,13 @@ layout: nil
     <h1><a href="/">Maërlyn</a></h1>
   </header>
   
-{% for post in site.posts limit:10 %}
-  {% assign page = post %}
-  {% include post.html %}
+  <article>
+    <ul>
+{% for post in site.posts limit %}
+      <li><a href="{{ post.url }}">{{ post.title }}</a> <small>{{ post.date | date: "%Y. %m. %d." }}</small></li>
 {% endfor %}
-
-<footer>
-  <a href="archivum.html">Archívum</a>
-</footer>
+    </ul>
+  </article>
 
 <script type="text/javascript">
   var _gaq = _gaq || [];

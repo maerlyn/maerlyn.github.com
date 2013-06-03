@@ -25,3 +25,9 @@ article header h2 {
   text-align: center;
 }
 
+footer {
+  border-top: 1px solid #aaa;
+  text-align: center;
+  font-size: 1.6em;
+  padding: 1em;
+}
