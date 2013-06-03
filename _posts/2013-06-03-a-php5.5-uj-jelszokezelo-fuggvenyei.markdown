@@ -1,0 +1,84 @@
+---
+layout: post
+title: A PHP 5.5 új jelszókezelő függvényei
+---
+
+A PHP 5.5-ös verziójától kezdve elérhető lesz néhány új függvény, amelyek a jelszavak kezelését segítik. Ezekről fogok írni most, hogy miért volt rájuk szükség, miért kerültek be a PHP magjába, és hogyan lehet őket használni.
+
+## Háttér
+
+Hiába ismert az MD5-ben egy hiba 1996, a SHA1-ben pedig 2005 óta, a mai napig ezek azok a függvények, amelyeket a PHP-ban programozók többsége használ a jelszavak egyirányú kódolására (hash-selérére). Rossz esetben salt nélkül, kicsit jobb esetben egy jelszavanként különböző salttal.
+
+Akárhogy is, ezekben egy hiba közös: sem az MD5, sem az SHA1 nem erre lett megalkotva. Mintkettőnek eredeti célja az, hogy üzenetek gyors integritás-ellenőrzését tegyék lehetővé &ndash; tehát fontos szempont volt tervezésükkor, hogy gyorsak legyenek, és egyszerűen meg lehessen őket valósítani áramkörök szintjén. Pontosan ez a sebesség teszi őket alkalmatlanná arra, hogy jelszavakat biztonságosan tároljunk benne.
+
+2012 májusában [Anthony Ferrara](https://twitter.com/ircmaxell) hozta létre a [problémát megoldani célzott RFC-t](https://wiki.php.net/rfc/password_hash), amit érdemes végigolvasni. Ebben részletesen leírja, mi a probléma a jelenlegi helyzettel. Mindössze négy új függvényt ír le azzal a céllal, hogy olyan egyszerű legyen a használata: balgaság legyen bárhogy máshogy csinálni.
+
+## A függvények
+
+### `password_hash`
+
+Ezzel tudod hashelni a jelszót új felhasználó létrehozásakor.
+
+`string password_hash(string $password, int $algo, array $options = array())`
+
+Az első paraméter maga a kódolandó jelszó, a második a használandó algoritmus. Kettő konstans van erre definiálva, a `PASSWORD_BCRYPT` és a `PASSWORD_DEFAULT`. Jelenleg mindkettőnek ugyanaz az értéke, de ha később egy erősebb algoritmus is beépítésre kerül, a default arra fog módosulni.
+
+Az opciók közt két értéket adhatunk meg: az egyik a `salt`, amit ha kihagyunk, random generál egyet; a másik a `cost`, ami az algoritmus műveletigényére van hatással. Ezt érdemes úgy belőni, hogy egy másodperc körüli idő alatt számoljon egy hasht. Érvényes bármely 4 és 30 közti egész, az alapértelmezett a 10.
+
+Visszatérési értéke bcrypt esetén egy fix 60 karakteres string, ami tartalmaz mindent, amire ellenőrzéshez szükségünk van, azaz elég ezt mentenünk.
+
+### `password_verify`
+
+Ezzel lehet ellenőrizni bejelentkezéskor, helyes jelszót adott-e meg a felhasználó.
+
+`bool password_verify($password, $hash)`
+
+Két paramétert vár, az első a kapott jelszó, a második a korábban mentett hash. Azt adja vissza, stimmel-e.
+
+Érdekesség, hogy a háttérben egy olyan string-összehasonlító függvényt használ, ami ellenálló az időzítéses támadásokkal szemben: nem tér vissza hamissal az első eltérésnél, hanem mindenképp végignézi mindkét stringet.
+
+### `password_needs_rehash`
+
+Ezzel azt tudod eldönteni, szükséges-e a jelszó újrakódolása azért, mert a rendszer közben átállt új algoritmusra, vagy nagyobb költségre. A bejelentkezési folyamat részeként lehet használni, amikor megvan a kódolatlan jelszó is.
+
+`bool password_needs_rehash(string $hash, int $algo, array $options = array())`
+
+Paraméterei annyiban térnek el a `password_hash`-étől, hogy ez egy már kódolt jelszót vár, nem egy eredetit. Azt adja vissza, gyengébb paraméterekkel (algoritmus, költség) lett-e hash-elve, mint amit kapott.
+
+### `password_get_info`
+
+Ezzel tudod egy hash kódoláskor megadott paramétereit.
+
+`array password_get_info(string $hash)`
+
+A visszatérési értéke egy tömb `algo` és `options` kulcsokkal, az első a használt algoritmust adja meg, a második az annak átadott paramétereket, mint például a költség.
+
+## Használati példa
+
+Az alábbi példa a fentebb linkelt RFC-ből származik. Megmutatja, hogy kell egy kapott jelszót hash-elni adott paraméterekkel, azt ellenőrzizni, illetve megnézni, szükséges-e az újbóli kódolás.
+
+{% highlight php startinline %}
+<?php
+$password = "rasmuslerdorf";
+$hash = password_hash($password, PASSWORD_BCRYPT, array(
+    "cost" => 7,
+    "salt" => "usesomesillystringfor",
+)));
+
+if (password_verify($password, $hash)) {
+    if (password_needs_rehash($hash, PASSWORD_BCRYPT, array(
+            'cost' => 8,
+    ))) {
+        update_password_in_db($password);
+    }
+    log_user_in();
+} else {
+    error_wrong_password();
+}
+{% endhighlight %}
+
+Az jól látható, hogy innentől felesleges egyéb megoldásokat használni, ennél tényleg nem lehet egyszerűbb.
+
+## És 5.5 előtt?
+
+Nem kell félni attól, hogy ezek csak évek múltán lennének használhatók, amikor már a szolgáltatók többsége átállt 5.5-re. Az eredeti, C nyelvű patch szerzője megvalósította ugyanazt PHP-ban is [password_compat](https://github.com/ircmaxell/password_compat) néven, ezt már 5.3.7-től kezdve lehet használni. Működése pontosan ugyanaz, mint a majdani beépített függvényeké.
