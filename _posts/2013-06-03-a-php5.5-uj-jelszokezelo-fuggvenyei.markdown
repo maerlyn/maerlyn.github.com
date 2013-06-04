@@ -55,7 +55,7 @@ A visszatérési értéke egy tömb `algo` és `options` kulcsokkal, az első a 
 
 ## Használati példa
 
-Az alábbi példa a fentebb linkelt RFC-ből származik. Megmutatja, hogy kell egy kapott jelszót hash-elni adott paraméterekkel, azt ellenőrzizni, illetve megnézni, szükséges-e az újbóli kódolás.
+Az alábbi példa a fentebb linkelt RFC-ből származik. Megmutatja, hogy kell egy kapott jelszót hash-elni adott paraméterekkel, azt ellenőrizni, illetve megnézni, szükséges-e az újbóli kódolás.
 
 {% highlight php startinline %}
 <?php
