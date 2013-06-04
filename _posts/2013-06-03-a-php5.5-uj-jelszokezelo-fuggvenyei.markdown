@@ -9,7 +9,7 @@ A PHP 5.5-ös verziójától kezdve elérhető lesz néhány új függvény, ame
 
 Hiába ismert az MD5-ben egy hiba 1996, a SHA1-ben pedig 2005 óta, a mai napig ezek azok a függvények, amelyeket a PHP-ban programozók többsége használ a jelszavak egyirányú kódolására (hash-selérére). Rossz esetben salt nélkül, kicsit jobb esetben egy jelszavanként különböző salttal.
 
-Akárhogy is, ezekben egy hiba közös: sem az MD5, sem az SHA1 nem erre lett megalkotva. Mintkettőnek eredeti célja az, hogy üzenetek gyors integritás-ellenőrzését tegyék lehetővé &ndash; tehát fontos szempont volt tervezésükkor, hogy gyorsak legyenek, és egyszerűen meg lehessen őket valósítani áramkörök szintjén. Pontosan ez a sebesség teszi őket alkalmatlanná arra, hogy jelszavakat biztonságosan tároljunk benne.
+Akárhogy is, ezekben egy hiba közös: sem az MD5, sem az SHA1 nem erre lett megalkotva. Mindkettőnek eredeti célja az, hogy üzenetek gyors integritás-ellenőrzését tegyék lehetővé &ndash; tehát fontos szempont volt tervezésükkor, hogy gyorsak legyenek, és egyszerűen meg lehessen őket valósítani áramkörök szintjén. Pontosan ez a sebesség teszi őket alkalmatlanná arra, hogy jelszavakat biztonságosan tároljunk benne.
 
 2012 májusában [Anthony Ferrara](https://twitter.com/ircmaxell) hozta létre a [problémát megoldani célzott RFC-t](https://wiki.php.net/rfc/password_hash), amit érdemes végigolvasni. Ebben részletesen leírja, mi a probléma a jelenlegi helyzettel. Mindössze négy új függvényt ír le azzal a céllal, hogy olyan egyszerű legyen a használata: balgaság legyen bárhogy máshogy csinálni.
 
