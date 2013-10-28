@@ -1,0 +1,240 @@
+---
+layout: post
+title: Vagrant
+---
+
+A napi munka során gyakran előkerül az a probléma, hogy mindhárom nagy operációs rendszer használatban van a cégnél. Hosszadalmas munka mindegyiken egy ugyanolyan fejlesztőkörnyezetet beállítani, és még így sem ideális a helyzet: a Windows kis/nagybetűre érzéketlen filerendszerén történő fejlesztés után könnyen problémákba ütközhetünk egy Linuxos case-sensitive rendszerre történő deploy során. És ekkor még nem esett szó az olyan, egyes alkalmazások működéséhez szükséges külső komponensekről, mint egy queue szerver, MTA vagy adatbázis.
+
+És itt lép színre  a [Vagrant][vagrant].
+
+## Mi ez?
+
+A Vagrant egy olyan program, melynek célja az, hogy könnyen és gyorsan tudjunk több gépen (és több operációs rendszeren) azonos virtuális gépeket előállítani. Így például a repository-nk klónozása és egy `vagrant up` után máris lehet dolgozni anélkül, hogy akár órákat kellene eltöltenünk egy virtuális gép telepítésével és beállításával. Alapértelmezetten VirtualBoxot használ a háttérben (mert minden platformon fut és ingyenes), de van lehetőség VMWare használatára is.
+
+Ha ez a gép elkészült, onnantól az futtatja a kódunk, de a saját operációs rendszerünk böngészőjével, fejlesztői eszközeivel tudunk továbbra is dolgozni.
+
+## Hogyan működik?
+
+A rendszer lelke a repositoryban levő Vagrantfile, amiben a gépünk főbb paramétereit adhatjuk meg, például hogy milyen alaprendszerre épül, legyen-e hálózati elérése és hogyan, illetve hogy milyen módszerrel történjen a provisioning (a telepítés utáni konfiguráció). Ez egy egyszerű, ruby szintaxist követő file, például valami hasonló:
+
+    Vagrant.configure("2") do |config|
+      config.vm.box = "precise64"
+      config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    
+      config.vm.network :private_network, ip: "192.168.33.33"
+        config.vm.network :forwarded_port, guest: 80, host: 8080
+        config.ssh.forward_agent = true
+    
+      config.vm.provider :virtualbox do |v|
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--memory", 512]
+      end
+    
+      nfs_setting = RUBY_PLATFORM =~ /darwin/ || RUBY_PLATFORM =~ /linux/
+      config.vm.synced_folder "./", "/vagrant", id: "vagrant-root" , :nfs => nfs_setting
+
+      config.vm.provision :shell, :inline => 'echo -e "mysql_root_password=root
+    controluser_password=root" > /etc/phpmyadmin.facts;'
+    
+      config.vm.provision :puppet do |puppet|
+        puppet.manifests_path = "vagrant"
+        puppet.module_path = "vagrant/modules"
+        puppet.options = ['--verbose']
+      end
+    end
+
+Ez egy Ubuntu Precise-ra (12.04 LTS) épülő gépet ír le, aminek van egy belső hálózati címe, a host gép 8080-as portja át van irányítva a guest 80-as portjára, van internet-elérése, 512MB RAM-ja, egy szinkronizált mappája (a Vagrantfile mappája a guest gép /vagrant útvonalán), valamint [puppet][puppet]tel történik a konfigurációja.
+
+## Használata
+
+Az alapvető műveletekhez csak néhány parancsot kell megtanulnunk:
+
+- `vagrant up`: elindítja a gépet, szükség esetén a megadott url-ről letöltve a boxot és létrehozza, konfigurálja indítás előtt.
+- `vagrant ssh`: ssh-val bejelentkezik a gépre - ez Windowson nem működik, mert nincs ssh parancs, de ott a putty mint workaround.
+- `vagrant suspend`: hibernálja a gépet, hogy később pontosan a mostani állapotból tudd folytatni
+- `vagrant halt`: leállítja a gépet.
+- `vagrant destroy`: megsemmisíti a gépet, azaz töröl minden file-t, ami hozzá tartozik. A végén pontosan abban az állapotban leszünk, mintha nem is futtattuk volna az első `vagrant up`-ot.
+
+## Puppet
+
+A használata önmagában is megérne egy bejegyzést, ezért itt csak a fő configfile-on megyek végig, ami jelen esetben a `vagrant/default.pp`. Akit érdekel a teljes beállítás, [githubon megtekintheti][silexalapvagrantbranch].
+
+    group { 'puppet': ensure => present }
+    Exec { path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ] }
+    File { owner => 0, group => 0, mode => 0644 }
+
+Alapbeállítások. Legyen egy puppet nevű csoport a gépen, ez legyen a PATH, valamint az új file-ok alapértelmezett tulaja a root, 644-es engedélyekkel.
+
+    class {'apt':
+      always_apt_update => true,
+    }
+    
+    Class['::apt::update'] -> Package <|
+        title != 'python-software-properties'
+    and title != 'software-properties-common'
+    |>
+
+Futtasson egy `apt-get update`-et minden csomagra, ami nincs a felsoroltak közt.
+
+    apt::key { '4F4EA0AAE5267A6C': }
+    
+    apt::ppa { 'ppa:ondrej/php5-oldstable':
+      require => Apt::Key['4F4EA0AAE5267A6C']
+    }
+
+Adjon hozzá egy új APT kulcsot, majd egy PPA-t az előbbi kulccsal. Ez az 5.4-es php-hoz szükséges, mert a Precise-ban csak 5.3 elérhető.
+
+    package { [
+        'build-essential',
+        'vim',
+        'curl',
+        'git-core',
+        'mc',
+      ]:
+      ensure  => 'installed',
+    }
+
+Ezek a csomagok legyenek telepítve.
+
+    class { 'apache': }
+    
+    apache::dotconf { 'custom':
+      content => 'EnableSendfile Off',
+    }
+    
+    apache::module { 'rewrite': }
+    
+    file { '/etc/apache2/sites-enabled/000-default':
+      ensure => absent,
+    }
+    
+    apache::vhost { 'localhost':
+      server_name   => false, # hogy ez legyen a default
+      serveraliases => [
+    ],
+      docroot       => '/vagrant/',
+      port          => '80',
+      env_variables => [
+    ],
+      priority      => '1',
+    }
+
+Legyen apache-unk, amiben tiltva van a sendfile, engedélyezve a rewrite modul. Szintén tiltva legyen az alapértelmezetten létrehozott virtualhost, mert sajátot akarunk csinálni localhost néve, és ezt szeretnénk a defaultnak; a DocumentRoot pedig legyen a korábban beállított `/vagrant`, ami a host gépen azzal a mappával van szinkronizálva, amelyben a `Vagrantfile` található.
+
+    class { 'php':
+      service             => 'apache',
+      service_autorestart => false,
+      module_prefix       => '',
+    }
+    
+    php::module { 'php5-mysql': }
+    php::module { 'php5-cli': }
+    php::module { 'php5-curl': }
+    php::module { 'php5-gd': }
+    php::module { 'php5-intl': }
+    php::module { 'php5-mcrypt': }
+    
+    class { 'php::devel':
+      require => Class['php'],
+    }
+    
+    class { 'php::pear':
+      require => Class['php'],
+    }
+    
+    class { 'xdebug':
+      service => 'apache',
+    }
+
+Legyen telepítve PHP az adott modulokkal, fejlesztésre előkészítve, xdebuggal.
+
+    class { 'composer':
+      require => Package['php5', 'curl'],
+    }
+
+Legyen rendszerszinten elérhető a [Composer][composer].
+
+    puphpet::ini { 'xdebug':
+      value   => [
+        'xdebug.default_enable = 1',
+        'xdebug.remote_autostart = 0',
+        'xdebug.remote_connect_back = 1',
+        'xdebug.remote_enable = 1',
+        'xdebug.remote_handler = "dbgp"',
+        'xdebug.remote_port = 9000'
+      ],
+      ini     => '/etc/php5/conf.d/zzz_xdebug.ini',
+      notify  => Service['apache'],
+      require => Class['php'],
+    }
+    
+Az xdebug legyen engedélyezve, és lehessen távolról kapcsolódni hozzá. Ez a gyakorlatban a helyi hálózatot jelenti, így lehet a host gépről, vagy akár egy másik gépről is debuggolni.
+
+    puphpet::ini { 'php':
+      value   => [
+        'date.timezone = "Europe/Budapest"'
+      ],
+      ini     => '/etc/php5/conf.d/zzz_php.ini',
+      notify  => Service['apache'],
+      require => Class['php'],
+    }
+    
+    puphpet::ini { 'custom':
+      value   => [
+        'display_errors = On',
+        'error_reporting = -1',
+        'allow_url_fopen = 1'
+      ],
+      ini     => '/etc/php5/conf.d/zzz_custom.ini',
+      notify  => Service['apache'],
+      require => Class['php'],
+    }
+    
+Legyen a PHP-nk Budapesti időzónára beállítva, mutassa a hibákat (az összeset), és legyen engedélyezve a http protocol wrapper.
+
+    class { 'mysql::server':
+      config_hash   => { 'root_password' => 'root' }
+    }
+    
+    mysql::db { 'silex-alap':
+      grant    => [
+        'ALL'
+      ],
+      user     => 'silex-alap',
+      password => 'silex-alap',
+      host     => 'localhost',
+      sql      => '/vagrant/db.sql',
+      charset  => 'utf8',
+      require  => Class['mysql::server'],
+    }
+
+Legyen MySQL a gépen, a root jelszó legyen root, ezen felül jöjjön létre egy silex-alap adatbázis ugyanilyen nevű és jelszavú felhasználóval, akinek mindenre van benne joga, és rögtön importálja is ide a db.sql file-t.
+
+    class { 'phpmyadmin':
+      require => [Class['mysql::server'], Class['mysql::config'], Class['php']],
+    }
+    
+    file { '/etc/apache2/conf.d/phpmyadmin':
+        ensure => 'link',
+        target => '/etc/phpmyadmin/apache.conf',
+        require => Class["phpmyadmin"],
+    }
+    
+Legyen telepítve phpmyadmin, és annak confja legyen engedélyezve az apache-ban, így lehessen elérni a /phpmyadmin útvonalon.
+
+## Végeredmény
+
+A [silex-alap][silexalap] repository klónozása után a gyökerében egyetlen `vagrant up` parancs (és egy kávényi várakozás) után van:
+
+- egy linuxos virtuális gépünk
+- apache2, ami a /vagrant mappát szolgálja ki
+- mysql, egy adatbázissal a db.sql alapján és egy nem-root userrel
+- php5.4 a fejlesztéshez szükséges leggyakoribb modulokkal és beállításokkal
+- phpmyadmin
+
+ [vagrant]: http://www.vagrantup.com/
+ [puppet]: http://puppetlabs.com/
+ [silexalapvagrantbranch]: https://github.com/insolis/silex-alap/tree/vagrant/vagrant
+ [silexalap]: https://github.com/insolis/silex-alap
+ [composer]: http://getcomposer.org/
+
