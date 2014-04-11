@@ -1,0 +1,65 @@
+==================================================================
+https://keybase.io/maerlyn
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://maerlyn.eu
+  * I am maerlyn (https://keybase.io/maerlyn) on keybase.
+  * I have a public key with fingerprint 3EC2 C545 F349 7D5B F305  3F5A 1B36 82AE 0A22 291B
+
+To claim this, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "3ec2c545f3497d5bf3053f5a1b3682ae0a22291b",
+            "host": "keybase.io",
+            "key_id": "1B3682AE0A22291B",
+            "uid": "750913d5372f6d4098f8d0841b3bb200",
+            "username": "maerlyn"
+        },
+        "service": {
+            "hostname": "maerlyn.eu",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1397252889,
+    "expire_in": 157680000,
+    "prev": "bada3db90fb7ebab1e5b8cbfe06a780a08296fd44c4c5688b6e2cae081444222",
+    "seqno": 2,
+    "tag": "signature"
+}
+
+with the aforementioned key, yielding the PGP signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+owFVkVtIFFEYx3etrIRC8IYpEqOhwrbN/bIZsdJSoQ/VWkpa25yZMzrlzmx7MbfN
+6PbQQpYlYZkFom1oEgsGSSoYFWpbRrR2h+xFo8wgu/lkZ6QeOi+H8/9+3/+7nKYV
+i0wJ5iz2xK0krDDLHBuaASbnFikzhAFdDmK2EHYALlyKqlVDr8eran7MhlFQIiWG
+ZhSKFjiZAQqFM5TCiASgWJ4UIS6SJCkQALNgNbrPyEA2QPRBq6ojDT1cqoxUotjg
+7Q7cvsAXo1hgIcAxuEBQMkNxpMLKNC7wCi/jPI0KAEDiuAH6oFcT3RDRbhF6a4Ma
+1mDBkFinStBo2aj8P2CFAZTo8ep+XdJrkV7j93tsRpo/6DG4QxC4/jq4gKrJaGiU
+UAe9PlXXMBuBSMmvGpYEJXAkQ/K8YMFgvUf1QpdqEAzH8jg6RhlYhyyBKIuUDARc
+ARwEIiAgA3gJKBBnRY7HRZwnBVaRaVqiJYblecBCUkIb5AmaptFWMGOmg5qO2UjU
+pliNLH1qtSb6A16INYTN2YtN5gRT4pIE49tMScuT/33mvu6l8/LU6fiyi7NtN8fv
+4WWRzZEz4aNSM3fJnvgteWrTzviq9fbmdz3X9wcsob74l8Rx3TH+Y67qbmTXhd+B
+tEnnlSifMT1zZOKGOqE8by3J9w+tqxgbvPZx2+yv2Is7stte1L86s3m0HX8/2hEN
+5ZU8cg5vfNK4523r5IZQtDm962RB/7PBpNLUygj96eqbsZxyISXva3pLV2N90+GK
+svLcthxHSuk0vD+iWnurhrszOovm5y23w85wR7jTMdDY6z77mnrcXvzw/NOWY/LW
+WFDuLijqS5vIX5M6WRZNG2j6bi3cfmrv2t2X++tHPhx/FVN/Ble+1HIr7TvOPYj3
+zBV8zv4D
+=oVvp
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/maerlyn
+
+==================================================================
+
