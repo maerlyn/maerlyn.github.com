@@ -1,7 +1,6 @@
 safe: true
 highlighter: pygments
 paginate: 10
-markdown: rdiscount
 
 auto: true
 server: true
