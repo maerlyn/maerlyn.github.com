@@ -1,0 +1,89 @@
+---
+layout: post
+title: Go és solr
+---
+
+Időnként azóta is előveszem a [Go][1]t, most épp az egyik tervezett melóhelyi átállás adta az ötletet a következő játékhoz.
+
+Van egy solr core-unk és egy nodejs microservice-ünk, amik ugyanazokat az adatokat tárolják, csak picit máshogy, és másutt is használjuk őket. Ezt akarjuk kiváltani egyetlen kibővített core-ral, ami mindkét célra alkalmas.
+
+A configot az [ini csomaggal][2] olvasom:
+
+{% highlight go %}
+cfg, err = ini.LoadSources(ini.LoadOptions{}, 
+    "/etc/icom/settings_locationserver.ini")
+if err != nil {
+	panic(err)
+}
+{% endhighlight %}
+
+A [solr csomag][3] felett meg van egy saját wrapperem, ami összeállít és megfuttat egy queryt:
+
+{% highlight go %}
+func (sc SolrClient) simpleQuery(q string, rows int)
+    *solr.SelectResponse {
+	query := solr.Query{
+		Params: solr.URLParamMap{
+			"q": []string{q},
+		},
+		Rows: rows,
+	}
+
+	res, err := sc.connection.Select(&query)
+
+	if err != nil {
+		log.Printf("solr error: %s\n", err)
+	}
+
+	return res
+}
+{% endhighlight %}
+
+Ezzel az ID szerinti lekérdezés ilyen egyszerű:
+
+{% highlight go %}
+func (sc SolrClient) FindById(id int)
+    (map[string]interface{}, bool) {
+	res := sc.simpleQuery("location_id:"+strconv.Itoa(id), 1)
+
+	if res.Results.Len() == 0 {
+		return nil, false
+	}
+
+	return res.Results.Get(0).Fields, true
+}
+{% endhighlight %}
+
+mert az ID saját forrásból jön (mysql auto_inc mező).
+
+Ezekkel a http requestet megoldjuk pár sorral:
+
+{% highlight go %}
+func returnJson(w http.ResponseWriter, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(data)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getLocationById(w http.ResponseWriter, r *http.Request,
+    ps httprouter.Params) {
+	id, _ := strconv.Atoi(ps.ByName("id"))
+
+	location, found := solrClient.FindById(id)
+
+	if !found {
+		w.WriteHeader(404)
+		return
+	}
+
+	returnJson(w, location)
+}
+{% endhighlight %}
+
+ [1]: https://golang.org
+ [2]: https://github.com/go-ini/ini/tree/v1.21.1
+ [3]: https://github.com/rtt/Go-Solr
+
