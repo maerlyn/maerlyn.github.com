@@ -4,9 +4,6 @@
       <h2>{{ post.date | date: "%Y. %m. %d." }}</h2>
     </header>
     
-    {% if content %}
-      {{ content }}
-    {% else %}
-      {{ post.content }}
-    {% endif %}
+    {{ post.content }}
+   
   </article>
