@@ -19,7 +19,6 @@ layout: nil
   </header>
   
 {% for post in site.posts limit:10 %}
-  {% assign page = post %}
   {% include post.html %}
 {% endfor %}
 

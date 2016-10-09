@@ -1,7 +1,4 @@
 safe: true
-highlighter: pygments
+highlighter: rouge
 paginate: 10
-
-auto: true
-server: true
-
+gems: [jekyll-paginate]
