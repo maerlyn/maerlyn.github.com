@@ -1,4 +1,10 @@
 ---
 layout: default
 ---
+
+{% if !post %}
+{% assign post = page %}
+{% endif %}
+
+{% assign post = page %}
 {% include post.html %}
